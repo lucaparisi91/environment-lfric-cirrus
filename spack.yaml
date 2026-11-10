@@ -1,0 +1,118 @@
+# This is a Spack Environment file.
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+
+spack:
+
+  specs:
+
+    - group: gcc-stack
+      override:
+
+
+        packages:
+
+          c:
+            prefer:
+            - gcc
+          cxx:
+            prefer:
+            - gcc
+          fortran:
+            prefer:
+            - gcc
+      specs:
+      - lfric-meta@3.2 +xios +vernier ^xios@XIOS2    %%gcc_all
+      - lfric-meta@3.2 ~xios +vernier  %%gcc_all
+      - hpctoolkit %gcc_all
+      - darshan-util %gcc_all
+      - darshan-runtime %gcc_all
+      - py-darshan %gcc_all
+      - scorep %gcc_all
+
+    - group: cce-stack
+      override:
+        packages:
+          c:
+            prefer:
+            - cce
+          cxx:
+            prefer:
+            - cce
+          fortran:
+            prefer:
+            - cce
+      specs:
+        - lfric-meta@3.2 +xios +vernier ^xios@XIOS2 %%cce_all
+        - lfric-meta@3.2 ~xios +vernier  %%cce_all
+
+  concretizer:
+    
+    unify: when_possible
+    'splice:':
+      automatic: true
+
+  config:
+    install_tree:
+      root: $env/opt
+      padding_length: 120
+  repos:
+    metoffice: $env/repos/metoffice/spack_repo/metoffice
+
+  modules:
+    default:
+      'enable:':
+      - lmod
+      roots:
+        lmod: $env/modules
+      lmod:
+        projections:
+          all: '{name}-{compiler.name}/{version}'
+          lfric-meta +xios: '{name}-{compiler.name}-xios/{version}'
+          lfric-meta ~xios: '{name}-{compiler.name}-no-xios/{version}'
+
+        hash_length: 0
+        hierarchy:: []
+        
+        core_compilers: []
+
+        hide_implicits: true
+        all:
+          autoload: run
+        heaptrack:
+          autoload: none
+        exclude:
+        - cray-mpich
+        - cray-libsci
+        - libfabric
+        - fftw
+        - hdf5
+        - cray-fftw
+        - parallel-netcdf
+        - netcdf-cxx4
+        - netcdf-fortran
+        - gcc
+        - cce
+      arch_folder: false
+
+      prefix_inspections:
+        ./lib:
+        - LD_LIBRARY_PATH
+        - LIBRARY_PATH
+        ./lib64:
+        - LD_LIBRARY_PATH
+        - LIBRARY_PATH
+        ./include:
+        - CPATH
+
+  view: false
+  
+  packages:
+    openssh:
+      # Only build with gcc
+      require: " %gcc"
+    gftl-shared:
+      require: " %gcc"
+    fargparse:
+      require: " %gcc"
